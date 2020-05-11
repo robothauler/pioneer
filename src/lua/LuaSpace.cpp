@@ -551,6 +551,34 @@ static int l_space_spawn_ship_landed_near(lua_State *l)
 	return 1;
 }
 
+// sb - central systembody, pos - absolute coordinates of given object
+static vector3d _orbital_velocity_random_direction(const SystemBody *sb, const vector3d &pos)
+{
+	// If we got a zero mass of central body - there is no orbit
+	if (sb->GetMass() < 0.01)
+		return vector3d(0.0);
+	// position of center systembody
+	vector3d sb_pos = sb->GetOrbit().OrbitalPosAtTime(Pi::game->GetTime());
+	// if position didn't calculated, then orbit doesn't exist -> root body
+	if (std::isnan(sb_pos.x))
+		sb_pos = vector3d(0.0);
+	// radius - vector of given point
+	vector3d rad = pos - sb_pos;
+	// calculating basis from radius - vector
+	vector3d k = rad.Normalized();
+	vector3d i;
+	if (std::fabs(k.z) > 0.999999) // very vertical = z
+		i = vector3d(1.0, 0.0, 0.0); // second ort = x
+	else
+		i = k.Cross(vector3d(0.0, 0.0, 1.0)).Normalized();
+	vector3d j = k.Cross(i);
+	// generating random 2d direction and putting it into basis
+	vector3d randomOrthoDirection = MathUtil::RandomPointOnCircle(1.0) * matrix3x3d::FromVectors(i, j, k).Transpose();
+	// calculate the value of the orbital velocity
+	double orbitalVelocity = sqrt(G * sb->GetMass() / rad.Length());
+	return randomOrthoDirection * orbitalVelocity;
+}
+
 /*
  * Function: SpawnCargoNear
  *
@@ -608,7 +636,7 @@ static int l_space_spawn_cargo_near(lua_State *l)
 
 	c_body->SetFrame(nearbody->GetFrame());
 	c_body->SetPosition((MathUtil::RandomPointOnSphere(min_dist, max_dist)) + nearbody->GetPosition());
-	c_body->SetVelocity(vector3d(0,0,0));
+	c_body->SetVelocity(_orbital_velocity_random_direction(Frame::GetFrame(nearbody->GetFrame())->GetSystemBody(), c_body->GetPosition()));
 	Pi::game->GetSpace()->AddBody(c_body);
 
 	LuaObject<Body>::PushToLua(c_body);

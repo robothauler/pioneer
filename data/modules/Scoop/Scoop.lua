@@ -200,6 +200,7 @@ local spawnDebris = function (debris, amount, star, lifetime)
 	for i = 1, Engine.rand:Integer(math.ceil(amount / 4), amount) do
 		cargo = debris[Engine.rand:Integer(1, #debris)]
 		body = Space.SpawnCargoNear(cargo, body, min, max, lifetime)
+		if i > 1 then body:SetVelocity(list[1].body:GetVelocity()) end
 		table.insert(list, { cargo = cargo, body = body })
 		min = 10
 		max = 1000
@@ -209,6 +210,7 @@ local spawnDebris = function (debris, amount, star, lifetime)
 	for i = 1, Engine.rand:Integer(1, 9) do
 		cargo = waste[Engine.rand:Integer(1, #waste)]
 		body = Space.SpawnCargoNear(cargo, body, min, max, lifetime)
+		body:SetVelocity(list[1].body:GetVelocity())
 	end
 
 	return list
