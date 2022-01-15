@@ -23,6 +23,10 @@ local itemSpacing = ui.rescaleUI(Vector2(6, 12), Vector2(1920, 1200))
 
 local face = nil
 
+local function awards()
+	return ({"No awards", "No medals"})
+end
+
 local function drawPlayerInfo()
     local player = Character.persistent.player
 
@@ -41,6 +45,12 @@ local function drawPlayerInfo()
 
 	textTable.withHeading(l.FINANCE, orbiteer.heading, {
 		{ l.CASH .. ":", ui.Format.Money(Game.player:GetMoney()) }
+	})
+
+	ui.newLine()
+
+	textTable.withHeading(l.AWARDS_AND_MEDALS, orbiteer.heading, {
+		player.awards and awards() or { l.NONE, "" },
 	})
 end
 
