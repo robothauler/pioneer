@@ -1671,6 +1671,10 @@
     "description": "",
     "message": "Medium passenger transport"
   },
+  "AWARDS_AND_MEDALS": {
+    "description": "",
+    "message": "Awards and Medals"
+  },
   "METAL_ALLOYS": {
     "description": "",
     "message": "Metal alloys"
