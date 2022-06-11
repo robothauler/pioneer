@@ -21,7 +21,7 @@ local MAX_RADAR_SIZE = 1000000000
 local MIN_RADAR_SIZE = 1000
 
 local shouldDisplay2DRadar
-local current_radar_size = 10000
+local current_radar_size = 1000000
 local blobSize = 6.0
 
 local function getColorFor(item)
