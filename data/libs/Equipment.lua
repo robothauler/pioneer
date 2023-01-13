@@ -119,7 +119,7 @@ misc.cargo_life_support = EquipType.New({
 })
 misc.autopilot = EquipType.New({
 	l10n_key="AUTOPILOT", slots="autopilot", price=1400,
-	capabilities={mass=1, set_speed=1, autopilot=1}, purchasable=true, tech_level=1,
+	capabilities={mass=0, set_speed=1, autopilot=1}, purchasable=true, tech_level=1,
 	icon_name="equip_autopilot"
 })
 misc.target_scanner = EquipType.New({
