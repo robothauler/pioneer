@@ -507,6 +507,10 @@
     "description": "",
     "message": "Days left: %d"
   },
+  "D_HOURS_LEFT": {
+    "description": "",
+    "message": "Hours left: %d"
+  },
   "ECONOMY_TRADE": {
     "description": "",
     "message": "Economy & Trade"
