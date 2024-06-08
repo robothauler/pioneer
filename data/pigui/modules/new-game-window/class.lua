@@ -32,13 +32,11 @@ StartVariants.register({
 	desc       = lui.START_AT_MARS_DESC,
 	location   = SystemPath.New(0,0,0,0,18),
 	logmsg     = lui.START_LOG_ENTRY_1,
-	shipType   = 'coronatrix',
+	shipType   = 'bowfin',
 	money      = 600,
 	hyperdrive = true,
 	equipment  = {
 		{ laser.pulsecannon_1mw,      1 },
-		{ misc.atmospheric_shielding, 1 },
-		{ misc.autopilot,             1 },
 		{ misc.radar,                 1 }
 	},
 	cargo      = {
@@ -53,13 +51,11 @@ StartVariants.register({
 	desc       = lui.START_AT_NEW_HOPE_DESC,
 	location   = SystemPath.New(1,-1,-1,0,4),
 	logmsg     = lui.START_LOG_ENTRY_2,
-	shipType   = 'pumpkinseed',
+	shipType   = 'kanara_civ',
 	money      = 400,
 	hyperdrive = true,
 	equipment  = {
 		{ laser.pulsecannon_1mw,      1 },
-		{ misc.atmospheric_shielding, 1 },
-		{ misc.autopilot,             1 },
 		{ misc.radar,                 1 }
 	},
 	cargo      = {
@@ -74,18 +70,16 @@ StartVariants.register({
 	desc           = lui.START_AT_BARNARDS_STAR_DESC,
 	location       = SystemPath.New(-1,0,0,0,16),
 	logmsg         = lui.START_LOG_ENTRY_3,
-	shipType       = 'xylophis',
+	shipType       = 'lunarshuttle',
 	money          = 100,
 	hyperdrive     = false,
 	equipment      = {
-		{misc.atmospheric_shielding,1},
-		{misc.autopilot,1},
 		{misc.radar,1}
 	},
 	cargo          = {
 		{ Commodities.hydrogen, 2 }
 	},
-	pattern    = 6,
+	pattern    = 1,
 	colors     = { Color('E17F00'), Color('FFFFFF'), Color('FF7F00') }
 })
 
