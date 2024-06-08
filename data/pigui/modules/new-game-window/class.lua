@@ -26,15 +26,8 @@ local profileCombo = { items = {}, selected = 0 }
 
 local equipment2 = {
 	computer_1     = "misc.autopilot",
-	laser_front_s2 = "laser.pulsecannon_1mw",
-	shield_s1_1    = "shield.basic_s1",
-	shield_s1_2    = "shield.basic_s1",
 	sensor         = "sensor.radar",
 	hull_mod       = "hull.atmospheric_shielding",
-	hyperdrive     = "hyperspace.hyperdrive_2",
-	thruster       = "misc.thrusters_default",
-	missile_bay_1  = "missile_bay.opli_internal_s2",
-	missile_bay_2  = "missile_bay.opli_internal_s2",
 }
 
 StartVariants.register({
@@ -42,8 +35,8 @@ StartVariants.register({
 	desc       = lui.START_AT_MARS_DESC,
 	location   = SystemPath.New(0,0,0,0,18),
 	logmsg     = lui.START_LOG_ENTRY_1,
-	shipType   = 'coronatrix',
-	money      = 600,
+	shipType   = 'natrix',
+	money      = 10000,
 	hyperdrive = true,
 	equipment  = {
 		-- { laser.pulsecannon_1mw,      1 },
@@ -63,8 +56,8 @@ StartVariants.register({
 	desc       = lui.START_AT_NEW_HOPE_DESC,
 	location   = SystemPath.New(1,-1,-1,0,4),
 	logmsg     = lui.START_LOG_ENTRY_2,
-	shipType   = 'pumpkinseed',
-	money      = 400,
+	shipType   = 'sinonatrix',
+	money      = 5000,
 	hyperdrive = true,
 	equipment  = {
 		-- { laser.pulsecannon_1mw,      1 },
@@ -84,8 +77,8 @@ StartVariants.register({
 	desc           = lui.START_AT_BARNARDS_STAR_DESC,
 	location       = SystemPath.New(-1,0,0,0,16),
 	logmsg         = lui.START_LOG_ENTRY_3,
-	shipType       = 'xylophis',
-	money          = 100,
+	shipType       = 'coronatrix',
+	money          = 2500,
 	hyperdrive     = false,
 	equipment      = {
 		-- {misc.atmospheric_shielding,1},
@@ -95,7 +88,7 @@ StartVariants.register({
 	cargo          = {
 		{ Commodities.hydrogen, 2 }
 	},
-	pattern    = 6,
+	pattern    = 1,
 	colors     = { Color('E17F00'), Color('FFFFFF'), Color('FF7F00') }
 })
 
