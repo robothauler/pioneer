@@ -265,8 +265,8 @@ local makeAdvert = function (station, manualFlavour, nearbystations)
 
 	if flavours[flavour].localdelivery then
 		if nearbystations == nil then
-			-- discard stations closer than 1000m and further than 20AU
-			nearbystations = findNearbyStations(station, 1000, 1.4960e11 * 20)
+			-- discard stations closer than 1000m and further than 50AU
+			nearbystations = findNearbyStations(station, 1000, 1.4960e11 * 50)
 		end
 		if #nearbystations == 0 then return nil end
 		location, dist = table.unpack(nearbystations[Engine.rand:Integer(1,#nearbystations)])
