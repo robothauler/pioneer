@@ -321,6 +321,7 @@ local onEnterSystem = function (player)
 
 			if (mission.risk + riskmargin) > Engine.rand:Number(1) then
 				ship = ShipBuilder.MakeShipNear(player, PirateTemplate, threat, 50, 100)
+				ship:SetLabel(mission.shipid)
 				pirate_msg = string.interp(l["PIRATE_GREETING_" .. Engine.rand:Integer(1, getNumberOfFlavours("PIRATE_GREETING"))], { client = mission.client.name })
 				Comms.ImportantMessage(pirate_msg, ship.label)
 				Comms.ImportantMessage(string.interp(l.TRANSMITTING_MSG, { shipid = mission.shipid }))
@@ -341,6 +342,7 @@ local onEnterSystem = function (player)
 				end)
 			else
 				ship = ShipBuilder.MakeShipDocked(Space.GetBody(mission.destination.bodyIndex), PirateTemplate, threat)
+				ship:SetLabel(mission.shipid)
 			end
 			mission.ship = ship
 		end
