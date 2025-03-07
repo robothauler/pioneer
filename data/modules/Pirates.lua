@@ -28,7 +28,7 @@ local onEnterSystem = function (player)
 			-- This will likely not produce an assailant larger than a Deneb.
 			local threat = 10.0 + Engine.rand:Number(100.0 * lawlessness)
 
-			local ship = ShipBuilder.MakeShipAroundStar(MissionUtils.ShipTemplates.GenericPirate, threat, 8, 12)
+			local ship = ShipBuilder.MakeShipAroundStar(MissionUtils.ShipTemplates.GenericPirate, threat, 0.05, 0.15)
 
 			-- pirates know how big cargo hold the ship model has
 			local playerCargoCapacity = ShipDef[player.shipId].equipCapacity
