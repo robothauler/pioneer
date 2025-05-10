@@ -67,6 +67,14 @@ local getRiskMsg = function (mission)
 		or l["RISK" .. gender .. "_" .. math.ceil(mission.risk * getNumberOfFlavours("RISK" .. gender))]
 end
 
+local getCustomerName = function (character)
+	if Engine.rand:Number(3) > 1 then
+		return character.surname
+	else
+		return character.name
+	end
+end
+
 local onChat = function (form, ref, option)
 	local ad = ads[ref]
 
@@ -109,7 +117,7 @@ local onChat = function (form, ref, option)
 		form:SetMessage(l["HOW_TO_" .. ad.flavour.id .. gender])
 
 	elseif option == 2 then
-		form:SetMessage(string.interp(getRiskMsg(ad), { wanted = ad.wanted.name }))
+		form:SetMessage(string.interp(getRiskMsg(ad), { wanted = getCustomerName(ad.wanted) }))
 
 	elseif option == 3 then
 		form:SetMessage(string.interp(l["HOW_MUCH_TIME_" .. ad.flavour.id], { date = Format.Date(ad.due) }))
