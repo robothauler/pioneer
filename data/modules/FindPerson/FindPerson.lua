@@ -204,7 +204,7 @@ local makeAdvert = function (station)
 	local urgency = Engine.rand:Number(1)
 	local ns = location:GetStarSystem().numberOfStations
 	local reward = math.ceil(dist * (typical_reward + ns) * (1 + risk) * (1.5 + urgency) * Engine.rand:Number(0.8, 1.2))
-	local due = Game.time + ns * 86400 + MissionUtils.TravelTime(dist) * 1.75 * (1.5 - urgency) * Engine.rand:Number(0.9, 1.1)
+	local due = ns * 86400 + MissionUtils.TravelTime(dist) * 1.75 * (1.5 - urgency) * Engine.rand:Number(0.9, 1.1)
 
 	local female = Engine.rand:Integer(1) == 1
 	local introtext = "INTROTEXT_" .. flavour.id .. (female and "_FEMALE" or "_MALE")
@@ -220,7 +220,8 @@ local makeAdvert = function (station)
 		location  = location,
 		shipid    = flavour.ship and Ship.MakeRandomLabel() or nil,
 		dist      = dist,
-		due       = utils.round(due, 3600),
+		due       = utils.round(Game.time + due, 3600),
+		timeout   = Game.time + due/2,
 		risk      = risk,
 		urgency   = urgency,
 		reward    = utils.round(reward, 100),
@@ -238,7 +239,7 @@ end
 
 local onUpdateBB = function (station)
 	for ref, ad in pairs(ads) do
-		if ad.due < Game.time + 5*24*60*60 then -- five day timeout
+		if ad.timeout < Game.time then
 			ad.station:RemoveAdvert(ref)
 		end
 	end
