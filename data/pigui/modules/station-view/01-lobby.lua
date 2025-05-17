@@ -9,6 +9,7 @@ local PlayerState = require 'PlayerState'
 local Game = require 'Game'
 local Rand = require 'Rand'
 local Format = require 'Format'
+local Engine = require 'Engine'
 local ShipDef = require 'ShipDef'
 local Character = require 'Character'
 local Commodities = require 'Commodities'
@@ -19,6 +20,7 @@ local PiGuiFace = require 'pigui.libs.face'
 local PiImage = require 'pigui.libs.image'
 local textTable = require 'pigui.libs.text-table'
 local ModalWindow = require 'pigui.libs.modal-win'
+local ChatForm = require 'pigui.libs.chat-form'
 
 local pionillium = ui.fonts.pionillium
 local orbiteer = ui.fonts.orbiteer
@@ -31,6 +33,10 @@ local Vector2 = _G.Vector2
 
 local rescaleVector = ui.rescaleUI(Vector2(1, 1), Vector2(1600, 900), true)
 local widgetSizes = ui.rescaleUI({
+	chatButtonBase = Vector2(0, 24),
+	chatButtonSize = Vector2(0, 24),
+	popupSize = Vector2(1200, 0),
+	popupSmall = Vector2(500, 0),
 	itemSpacing = Vector2(4, 9),
 	faceSize = Vector2(586,565),
 	buttonSizeBase = Vector2(72, 48),
@@ -44,6 +50,8 @@ widgetSizes.iconSize = Vector2(0, widgetSizes.buttonSizeBase.y)
 local face = nil
 local stationSeed = false
 local shipDef
+local manager
+local chatForm
 
 local hyperdrive ---@type Equipment.HyperdriveType?
 local hyperdrive_fuel
@@ -58,6 +66,12 @@ local popup = ModalWindow.New('lobbyPopup', function(self)
 	if ui.button("OK", Vector2(100*rescaleVector.x, 0)) then
 		self:close()
 	end
+end)
+
+local chatWin = ModalWindow.New('lobbyChatWindow', function() end, function (self, drawPopupFn)
+	ui.setNextWindowPosCenter('Always')
+	ui.setNextWindowSize(widgetSizes.popupSize, 'Always')
+	ui.withStyleColors({ PopupBg = ui.theme.colors.modalBackground }, drawPopupFn)
 end)
 
 local requestLaunch = function (station)
@@ -235,6 +249,78 @@ local function lobbyMenu()
 	ui.columns(1, '', false)
 end
 
+local onChat = function (form, ref, option)
+	form:Clear()
+
+	if option == -1 then
+		form:Close()
+		return
+	end
+
+	form:SetFace(manager)
+
+	local fee = math.max(50, Game.system.numberOfStations * 5)
+
+	if option == 0 then
+		form:SetMessage("Hello Commander, how can I help you?")
+
+		for i, p in ipairs(Character.persistent) do
+			if p.lastSavedSystemPath:IsSameSystem(Game.system.path) then
+				form:AddOption(p.name, i+10)
+			end
+		end
+	end
+
+	for i, _ in ipairs(Character.persistent) do
+		if option == i+10 then
+			if Engine.rand:Number(1) < Game.system.lawlessness and manager:TestRoll('lawfullness') then
+				form:SetMessage("This costs " .. fee)
+				form:AddOption("Pay " .. fee, i+100)
+				form:AddOption("No thanks", 1)
+			else
+				form:SetMessage("No info")
+			end
+			break
+		end
+	end
+
+	if option > 100 then
+		Game.player:AddMoney(-fee)
+		form:SetMessage(Character.persistent[option-100].lastSavedSystemPath:GetSystemBody().name)
+	elseif option == 1 then
+		form:SetMessage("Good luck")
+	end
+end
+
+local chatButton = function()
+	if Game.paused then
+		return
+	end
+
+	local chatFunc = function (form, option)
+		return onChat(form, ref, option)
+	end
+	local removeFunc = function ()
+	end
+	local closeFunc = function ()
+		chatWin:close()
+	end
+	local resizeFunc = function ()
+		if chatForm then
+			chatForm.style.contentWidth = nil
+			widgetSizes.popupSize = widgetSizes.popupSmall
+			-- ChatForm resizes the buttons so we need to reset their size when we resize the chat window.
+			widgetSizes.chatButtonSize(widgetSizes.chatButtonBase.x, widgetSizes.chatButtonBase.y)
+		end
+	end
+
+	chatForm = ChatForm.New(chatFunc, removeFunc, closeFunc, resizeFunc, ref, StationView, {buttonSize = widgetSizes.chatButtonSize})
+
+	chatWin.render = function() chatForm:render() end
+	chatForm.resizeFunc()
+	chatWin:open()
+end
+
 local function drawPlayerInfo()
 
 	local station = Game.player:GetDockedWith()
@@ -277,7 +363,7 @@ local function drawPlayerInfo()
 
 			ui.child("Wrapper", Vector2(0, -lobbyMenuHeight), function()
 				-- face display has 1:1 aspect ratio, and we need size for a launch button underneath
-				local infoColumnWidth = -math.min(ui.getContentRegion().y - buttonSizeSpacing, widgetSizes.faceSize.x) - widgetSizes.itemSpacing.x
+				local infoColumnWidth = -math.min(ui.getContentRegion().y - 2*buttonSizeSpacing, widgetSizes.faceSize.x) - widgetSizes.itemSpacing.x
 				ui.child("PlayerShipFuel", Vector2(infoColumnWidth, 0), function()
 					textTable.withHeading(station.label, orbiteer.title, {
 						{ tech_certified, "" },
@@ -294,6 +380,17 @@ local function drawPlayerInfo()
 
 					ui.withFont(orbiteer.title, function()
 						local size = Vector2(ui.getContentRegion().x, widgetSizes.buttonLaunchSize.y)
+						for _, p in ipairs(Character.persistent) do
+							if p.lastSavedSystemPath:IsSameSystem(Game.system.path) and p.lastSavedSystemPath ~= station.path then
+								ui.withFont(orbiteer.title, function()
+									if ui.button("Talk to the station manager", size) then
+										chatButton()
+										return
+									end
+								end)
+								break
+							end
+						end
 						if ui.button(l.REQUEST_LAUNCH, size) then
 							requestLaunch(station)
 						end
@@ -321,7 +418,8 @@ StationView:registerView({
 			if (stationSeed ~= station.seed) then
 				stationSeed = station.seed
 				local rand = Rand.New(station.seed)
-				face = PiGuiFace.New(Character.New({ title = l.STATION_MANAGER }, rand), {itemSpacing = widgetSizes.itemSpacing})
+				manager = Character.New({ title = l.STATION_MANAGER }, rand)
+				face = PiGuiFace.New(manager, {itemSpacing = widgetSizes.itemSpacing})
 			end
 
 			hyperdrive = Game.player:GetInstalledHyperdrive()
