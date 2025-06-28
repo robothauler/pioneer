@@ -141,7 +141,7 @@ local onChat = function (form, ref, option)
 			shipid      = ad.shipid,
 			ship        = nil,
 			interceptor = nil,
-			domicile    = ad.domicile,
+			returnLocation = ad.domicile,
 			introtext   = ad.introtext,
 			flavour     = ad.flavour,
 			risk        = ad.risk,
@@ -372,7 +372,7 @@ local onPlayerDocked = function (player, station)
 		end
 
 		if mission.status == "PENDING_RETURN" then
-			if mission.domicile == station.path then
+			if mission.returnLocation == station.path then
 				local reputation = 2
 				local oldReputation = Character.persistent.player.reputation
 				if Game.time <= mission.due then
@@ -485,7 +485,7 @@ local buildMissionDescription = function (mission)
 	local ui = require 'pigui'
 	local desc = {}
 	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
-	local domicileDist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.domicile)) or "???"
+	local domicileDist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.returnLocation)) or "???"
 	local danger = getRiskMsg(mission)
 
 	desc.description = mission.introtext:interp({
@@ -497,14 +497,14 @@ local buildMissionDescription = function (mission)
 		sectory = mission.destination.sectorY,
 		sectorz = mission.destination.sectorZ,
 		shipid = mission.shipid,
-		domicile = mission.domicile:GetSystemBody().name,
+		domicile = mission.returnLocation:GetSystemBody().name,
 		cash = ui.Format.Money(mission.reward, false),
 		dist = dist
 	})
 
 	desc.location = mission.location
 	desc.client = mission.client
-	desc.returnLocation = mission.domicile
+	desc.returnLocation = mission.returnLocation
 
 	desc.details = {
 		{ l.WANTED, mission.wanted.name },
@@ -513,8 +513,8 @@ local buildMissionDescription = function (mission)
 		mission.flavour.ship and { l.SHIP, mission.shipid },
 		false,
 		{ l.CLIENT, mission.client.name },
-		{ l.SYSTEM, ui.Format.SystemPath(mission.domicile) },
-		{ l.SPACEPORT, mission.domicile:GetSystemBody().name },
+		{ l.SYSTEM, ui.Format.SystemPath(mission.returnLocation) },
+		{ l.SPACEPORT, mission.returnLocation:GetSystemBody().name },
 		{ l.DISTANCE, domicileDist .. " " .. lc.UNIT_LY },
 		mission.flavour.company and { l.COMPANY, mission.company },
 		false,

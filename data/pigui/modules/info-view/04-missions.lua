@@ -95,26 +95,39 @@ local function makeMissionRows()
 	}
 
 	for _, mission in pairs(Character.persistent.player.missions) do
-		local locationName = mission.location:GetStarSystem().name -- ui.Format.SystemPath(mission.location)
-		if mission.location.bodyIndex then
-			locationName = mission.location:GetSystemBody().name .. ", " .. locationName
+		local location, locationName, dist_display
+
+		if mission.returnLocation and (mission.status == "COMPLETED" or mission.status == "PENDING_RETURN") then
+			location = mission.returnLocation
+		else
+			location = mission.location
 		end
 
-		local playerSystem = Game.system or Game.player:GetHyperspaceTarget():GetStarSystem()
-
-		-- Use AU for interplanetary, LY for interstellar distances
-		local dist, dist_display
-		if mission.location:IsSameSystem(playerSystem.path) and not Game.InHyperspace() then
-			if mission.location:IsBodyPath() then
-				local body = mission.location:GetSystemBody().body
-				dist = Game.player:GetPositionRelTo(body):length()
-				dist_display = "\n" .. ui.Format.Distance(dist)
-			else
-				dist_display = "\n-"
-			end
+		if type(location) == "string" then
+			locationName = location
+			dist_display = ""
 		else
-			dist = playerSystem:DistanceTo(mission.location)
-			dist_display = string.format("\n%.2f %s", dist, l.LY)
+			locationName = location:GetStarSystem().name -- ui.Format.SystemPath(location)
+			if location.bodyIndex then
+				locationName = location:GetSystemBody().name .. ", " .. locationName
+			end
+
+			local playerSystem = Game.system or Game.player:GetHyperspaceTarget():GetStarSystem()
+
+			-- Use AU for interplanetary, LY for interstellar distances
+			local dist
+			if location:IsSameSystem(playerSystem.path) and not Game.InHyperspace() then
+				if location:IsBodyPath() then
+					local body = location:GetSystemBody().body
+					dist = Game.player:GetPositionRelTo(body):length()
+					dist_display = "\n" .. ui.Format.Distance(dist)
+				else
+					dist_display = "\n-"
+				end
+			else
+				dist = playerSystem:DistanceTo(location)
+				dist_display = string.format("\n%.2f %s", dist, l.LY)
+			end
 		end
 
 		local row = {

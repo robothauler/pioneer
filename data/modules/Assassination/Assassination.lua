@@ -122,15 +122,13 @@ local onChat = function (form, ref, option)
 		}))
 
 	elseif option == 3 then
-		local backstation = Game.player:GetDockedWith().path
-
 		form:RemoveAdvertOnClose()
 
 		ads[ref] = nil
 
 		local mission = {
 			type		= "Assassination",
-			backstation	= backstation,
+			returnLocation	= ad.station.path,
 			client		= ad.client,
 			danger		= ad.danger,
 			due			= ad.due,
@@ -257,7 +255,6 @@ local onShipDestroyed = function (ship, body)
 				mission.notplayer = 'TRUE'
 			else -- well done, comrade
 				mission.status = 'COMPLETED'
-				mission.location = mission.backstation
 				mission.notplayer = 'FALSE'
 			end
 			mission.ship = nil
@@ -328,7 +325,7 @@ local onShipDocked = function (ship, station)
 		if ship:IsPlayer() then
 			local oldReputation = Character.persistent.player.reputation
 			if mission.status == 'COMPLETED' and
-			   mission.backstation == station.path then
+			   mission.returnLocation == station.path then
 				local text = string.interp(flavours[mission.flavour].successmsg, {
 					target	= mission.target,
 					cash	= Format.Money(mission.reward,false),
@@ -495,7 +492,7 @@ local function buildMissionDescription(mission)
 	}
 
 	desc.location = mission.location
-	desc.returnLocation = mission.backstation
+	desc.returnLocation = mission.returnLocation
 	desc.client = mission.client
 
 	return desc

@@ -17,10 +17,7 @@ local PlayerState = require 'PlayerState'
 local MissionUtils = require 'modules.MissionUtils'
 local ShipBuilder = require 'modules.MissionUtils.ShipBuilder'
 
-local OutfitRules = ShipBuilder.OutfitRules
-
 local l = Lang.GetResource("module-cargorun")
-local l_ui_core = Lang.GetResource("ui-core")
 local lc = Lang.GetResource 'core'
 
 local PirateTemplate = MissionUtils.ShipTemplates.WeakPirate
@@ -229,9 +226,10 @@ onChat = function (form, ref, option)
 		ads[ref] = nil
 		local mission = {
 			type            = "CargoRun",
-			domicile        = ad.domicile,
 			client          = ad.client,
-			location        = ad.location,
+			location        = ad.location, -- current destination
+			destination     = ad.location, -- first destination
+			domicile        = ad.domicile, -- last destination
 			localdelivery   = ad.localdelivery,
 			wholesaler      = ad.wholesaler,
 			pickup          = ad.pickup,
@@ -243,6 +241,7 @@ onChat = function (form, ref, option)
 			amount          = ad.negotiated_amount,
 			branch          = ad.branch,
 			cargotype       = ad.cargotype,
+			status          = cargo_picked_up and "ACTIVE" or "TO_PICK_UP",
 		}
 		table.insert(missions,Mission.New(mission))
 
@@ -494,7 +493,7 @@ local onEnterSystem = function (player)
 	local syspath = Game.system.path
 
 	for ref,mission in pairs(missions) do
-		if mission.status == "ACTIVE" and ((mission.location:IsSameSystem(syspath) and not mission.pickup) or (mission.domicile:IsSameSystem(syspath) and mission.cargo_picked_up)) then
+		if mission.destination:IsSameSystem(syspath) and not mission.pickup or mission.domicile:IsSameSystem(syspath) and mission.cargo_picked_up then
 			local risk = mission.risk
 			local pirates = 0
 
@@ -664,7 +663,7 @@ local onPlayerDocked = function (player, station)
 
 	-- First drop off cargo (if any such missions)
 	for ref,mission in pairs(missions) do
-		local readyToComplete = (mission.location == station.path and not mission.pickup) or
+		local readyToComplete = (mission.destination == station.path and not mission.pickup) or
 			(mission.domicile == station.path and mission.pickup and mission.cargo_picked_up)
 
 		if readyToComplete then
@@ -716,7 +715,7 @@ local onPlayerDocked = function (player, station)
 
 	-- Now we have space pick up cargo as well
 	for ref,mission in pairs(missions) do
-		local readyToPickup = mission.location == station.path and mission.pickup and not mission.cargo_picked_up
+		local readyToPickup = mission.destination == station.path and mission.pickup and not mission.cargo_picked_up
 
 		if readyToPickup then
 			if Game.time < mission.due then
@@ -730,7 +729,8 @@ local onPlayerDocked = function (player, station)
 					cargoMgr:AddCommodity(mission.cargotype, mission.amount);
 					mission.cargo_picked_up = true
 					Comms.ImportantMessage(l.WE_HAVE_LOADED_UP_THE_CARGO_ON_YOUR_SHIP, mission.client.name)
-					mission.status = "PENDING_RETURN"
+					mission.status = "ACTIVE"
+					mission.location = mission.domicile
 				end
 
 			else
@@ -794,17 +794,17 @@ end
 local buildMissionDescription = function(mission)
 	local ui = require 'pigui'
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.destination)) or "???"
 	local danger = getRiskMsg(mission)
 
 	desc.description = l[mission.introtext]:interp({
 		name = mission.client.name,
 		cargoname = mission.cargotype:GetName(),
-		starport = mission.location:GetSystemBody().name,
-		system = mission.location:GetStarSystem().name,
-		sectorx = mission.location.sectorX,
-		sectory = mission.location.sectorY,
-		sectorz = mission.location.sectorZ,
+		starport = mission.destination:GetSystemBody().name,
+		system = mission.destination:GetStarSystem().name,
+		sectorx = mission.destination.sectorX,
+		sectory = mission.destination.sectorY,
+		sectorz = mission.destination.sectorZ,
 		dom_starport = mission.domicile:GetSystemBody().name,
 		dom_system = mission.domicile:GetStarSystem().name,
 		dom_sectorx = mission.domicile.sectorX,
@@ -814,14 +814,14 @@ local buildMissionDescription = function(mission)
 		dist = dist
 	})
 
-	desc.location = mission.location
+	desc.location = mission.destination
 	desc.client = mission.client
 
 	if not mission.pickup then
 		desc.details = {
 			l.DELIVER_TO,
-			{ l.SPACEPORT,	mission.location:GetSystemBody().name },
-			{ l.SYSTEM,		ui.Format.SystemPath(mission.location) },
+			{ l.SPACEPORT,	mission.destination:GetSystemBody().name },
+			{ l.SYSTEM,		ui.Format.SystemPath(mission.destination) },
 			{ l.DISTANCE,	dist.." "..lc.UNIT_LY },
 			false,
 			{ l.DEADLINE,	ui.Format.Date(mission.due) },
@@ -835,8 +835,8 @@ local buildMissionDescription = function(mission)
 
 		desc.details = {
 			l.PICKUP_FROM,
-			{ l.SPACEPORT,	mission.location:GetSystemBody().name },
-			{ l.SYSTEM,		ui.Format.SystemPath(mission.location) },
+			{ l.SPACEPORT,	mission.destination:GetSystemBody().name },
+			{ l.SYSTEM,		ui.Format.SystemPath(mission.destination) },
 			{ l.DISTANCE,	dist.." "..lc.UNIT_LY },
 			l.DELIVER_TO,
 			{ l.SPACEPORT,	mission.domicile:GetSystemBody().name },

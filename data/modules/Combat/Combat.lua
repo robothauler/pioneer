@@ -159,9 +159,19 @@ local onChat = function (form, ref, option)
 			bonus       = -(math.ceil(ad.dedication * 3) - 1),
 			due         = ad.due,
 		}
+		if mission.rendezvous then
+			mission.returnLocation = mission.rendezvous
+		else
+			if mission.flavour.is_multi then
+				mission.returnLocation = mission.org .. "\n-"
+			else
+				mission.returnLocation = mission.org .. "\n" .. Game.system.faction.name
+			end
+		end
 		table.insert(missions,Mission.New(mission))
 		form:SetMessage(l["ACCEPTED_" .. Engine.rand:Integer(1, getNumberOfFlavours("ACCEPTED"))])
 		return
+
 	elseif option == 6 then
 		form:SetMessage(l.YOU_NEED_A_RADAR)
 	end
@@ -523,11 +533,8 @@ local buildMissionDescription = function(mission)
 
 	desc.client = mission.client
 
-	if mission.status == "PENDING_RETURN" and mission.rendezvous then
-		desc.location = mission.rendezvous
-	else
-		desc.location = mission.location
-	end
+	desc.location = mission.location
+	desc.returnLocation = mission.rendezvous or nil
 
 	local paymentLoc = mission.rendezvous and ui.Format.SystemPath(mission.rendezvous)
 		or string.interp(l[mission.flavour.id .. "_LAND_THERE"], { org = mission.org })

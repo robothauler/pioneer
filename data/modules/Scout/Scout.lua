@@ -661,6 +661,7 @@ local onScanComplete = function (player, scanId)
 		end
 		mission.station = newlocation
 	end
+	mission.returnLocation = newlocation
 
 	-- Set navigation target to the station
 	if Game.system and mission.station:IsSameSystem(Game.system.path) then
