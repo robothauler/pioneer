@@ -566,7 +566,7 @@ local onPlayerCargoChanged = function (comm, amount)
 	if Game.system:IsCommodityLegal(comm.name) or Game.player:IsDocked() then return end
 
 	for ref, mission in pairs(missions) do
-		if not mission.police and mission.location:IsSameSystem(Game.system.path) then
+		if not mission.police and mission.planet:IsSameSystem(Game.system.path) then
 			if (1 - Game.system.lawlessness) > Engine.rand:Number(4) then
 				local station = Game.player:FindNearestTo("SPACESTATION")
 				if station then mission.police = spawnPolice(station) end
@@ -596,6 +596,13 @@ local onCargoDestroyed = function (body, attacker)
 							mission.destination = e.body
 							break
 						end
+					end
+				end
+				if not mission.destination and mission.status ~= "FAILED" then
+					if mission.deliver_to_ship then
+						mission.location = l.SHIP .. "\n" .. mission.ship_label
+					else
+						mission.location = "-\n-"
 					end
 				end
 				break
@@ -657,6 +664,7 @@ local onShipDestroyed = function (ship, attacker)
 				station = mission.station:GetSystemBody().name
 			})
 			Comms.ImportantMessage(msg, mission.client.name)
+			mission.location = mission.station
 			break
 		end
 	end

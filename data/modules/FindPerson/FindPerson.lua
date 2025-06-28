@@ -344,6 +344,7 @@ local onEnterSystem = function (player)
 						Comms.ImportantMessage(pirate_msg, ship.label)
 						ship:AIDockWith(Space.GetBody(mission.destination.bodyIndex))
 					end
+					mission.location = mission.domicile
 					mission.status = "PENDING_RETURN"
 				end)
 			else
@@ -409,12 +410,14 @@ local onPlayerDocked = function (player, station)
 				if mission.flavour.taxi then
 					if Passengers.CountFreeBerths(player) > 0 then
 						Passengers.EmbarkPassenger(player, mission.wanted)
+						mission.location = mission.domicile
 						mission.status = "PENDING_RETURN"
 					else
 						-- cabin occupied or player has removed cabin?
 						Comms.ImportantMessage(l.YOU_DO_NOT_HAVE_A_CABIN, mission.wanted.name)
 					end
 				else
+					mission.location = mission.domicile
 					mission.status = "PENDING_RETURN"
 				end
 			else
@@ -484,7 +487,8 @@ end
 local buildMissionDescription = function (mission)
 	local ui = require 'pigui'
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
+	local destination = mission.destination:GetStarSystem().path
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(destination)) or "???"
 	local domicileDist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.domicile)) or "???"
 	local danger = getRiskMsg(mission)
 
@@ -502,13 +506,13 @@ local buildMissionDescription = function (mission)
 		dist = dist
 	})
 
-	desc.location = mission.location
+	desc.location = destination
 	desc.client = mission.client
 	desc.returnLocation = mission.domicile
 
 	desc.details = {
 		{ l.WANTED, mission.wanted.name },
-		{ l.SYSTEM, ui.Format.SystemPath(mission.location) },
+		{ l.SYSTEM, ui.Format.SystemPath(destination) },
 		{ l.DISTANCE, dist .. " " .. lc.UNIT_LY },
 		mission.flavour.ship and { l.SHIP, mission.shipid },
 		false,

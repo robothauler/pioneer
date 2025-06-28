@@ -263,6 +263,7 @@ local onChat = function (form, ref, option)
 			station     = station,
 			client      = ad.client,
 			location    = ad.location,
+			destination = ad.location,
 			difficulty  = ad.difficulty,
 			reward      = ad.reward,
 			due         = ad.due,
@@ -661,6 +662,7 @@ local onScanComplete = function (player, scanId)
 		end
 		mission.station = newlocation
 	end
+	mission.location = newlocation
 
 	-- Set navigation target to the station
 	if Game.system and mission.station:IsSameSystem(Game.system.path) then
@@ -747,7 +749,7 @@ local onGameStart = function ()
 	local currentBody = Game.player.frameBody
 	local mission
 	for ref,mission in pairs(missions) do
-		if currentBody and currentBody.path ~= mission.location then return end
+		if currentBody and currentBody.path ~= mission.destination then return end
 		if Game.time > mission.due then
 			mission.status = "FAILED"
 			mission:Remove()
@@ -760,7 +762,7 @@ end
 
 local buildMissionDescription = function (mission)
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.destination)) or "???"
 	local finished = mission.status == "COMPLETED" or mission.status == "FAILED"
 	local returnLocationDesc = ""
 
@@ -777,8 +779,8 @@ local buildMissionDescription = function (mission)
 		flavours[mission.flavour].introtext:interp(
 			{
 				name       = mission.client.name,
-				systembody = mission.location:GetSystemBody().name,
-				system     = ui.Format.SystemPath(mission.location:SystemOnly()),
+				systembody = mission.destination:GetSystemBody().name,
+				system     = ui.Format.SystemPath(mission.destination:SystemOnly()),
 				dist       = dist,
 				cash       = Format.Money(mission.reward),
 			})
@@ -786,8 +788,8 @@ local buildMissionDescription = function (mission)
 
 	desc.details = {
 		"Mapping",
-		{lc.SYSTEM..":",  ui.Format.SystemPath(mission.location) },
-		{l.TARGET_BODY,   mission.location:GetSystemBody().name },
+		{lc.SYSTEM..":",  ui.Format.SystemPath(mission.destination) },
+		{l.TARGET_BODY,   mission.destination:GetSystemBody().name },
 		{l.DISTANCE,      dist .. lc.UNIT_LY},
 		{l.DEADLINE,      Format.Date(mission.due)},
 		{luc.TYPE..":",   mission.orbital and l.ORBITAL_SCAN or l.SURFACE_SCAN},
@@ -800,7 +802,7 @@ local buildMissionDescription = function (mission)
 	if finished then
 		desc.returnLocation = mission.station
 	else
-		desc.location = mission.location
+		desc.location = mission.destination
 	end
 
 	return desc

@@ -136,6 +136,7 @@ local onChat = function (form, ref, option)
 			due			= ad.due,
 			flavour		= ad.flavour,
 			location	= ad.location,
+			destination	= ad.location,
 			reward		= ad.reward,
 			threat		= ad.threat,
 			shipid		= ad.shipid,
@@ -284,8 +285,8 @@ local onEnterSystem = function (ship)
 		if mission.status == 'ACTIVE' then
 			if not mission.ship then
 				if mission.due > Game.time then
-					if mission.location:IsSameSystem(syspath) then -- spawn our target ship
-						local station = Space.GetBody(mission.location.bodyIndex)
+					if mission.destination:IsSameSystem(syspath) then -- spawn our target ship
+						local station = Space.GetBody(mission.destination.bodyIndex)
 
 						local plan = ShipBuilder.MakePlan(AssassinationTargetShip, HullConfig.GetHullConfig(mission.shipid), mission.threat)
 						assert(plan)
@@ -421,7 +422,7 @@ local onAICompleted = function (ship, ai_error)
 
 					table.remove(planets, planet)
 				else
-					mission.ship:AIFlyTo(Space.GetBody(mission.location.bodyIndex))
+					mission.ship:AIFlyTo(Space.GetBody(mission.destination.bodyIndex))
 					mission.shipstate = 'outbound'
 				end
 			end
@@ -473,20 +474,20 @@ end
 local function buildMissionDescription(mission)
 	local ui = require 'pigui'
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.destination)) or "???"
 
 	desc.description = flavours[mission.flavour].introtext:interp({
 		name   = mission.client.name,
 		target = mission.target,
-		system = mission.location:GetStarSystem().name,
+		system = mission.destination:GetStarSystem().name,
 		cash   = ui.Format.Money(mission.reward,false),
 		dist  = dist
 	})
 
 	desc.details = {
 		{ l.TARGET_NAME, mission.target },
-		{ l.SPACEPORT, mission.location:GetSystemBody().name },
-		{ l.SYSTEM, ui.Format.SystemPath(mission.location) },
+		{ l.SPACEPORT, mission.destination:GetSystemBody().name },
+		{ l.SYSTEM, ui.Format.SystemPath(mission.destination) },
 		{ l.DISTANCE, dist.." "..lc.UNIT_LY },
 		false,
 		{ l.SHIP, mission.shipname },
@@ -494,7 +495,7 @@ local function buildMissionDescription(mission)
 		{ l.TARGET_WILL_BE_LEAVING_SPACEPORT_AT, ui.Format.Date(mission.due) }
 	}
 
-	desc.location = mission.location
+	desc.location = mission.destination
 	desc.returnLocation = mission.backstation
 	desc.client = mission.client
 

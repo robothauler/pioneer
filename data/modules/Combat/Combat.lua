@@ -145,8 +145,10 @@ local onChat = function (form, ref, option)
 			type        = "Combat",
 			client      = ad.client,
 			faction     = Game.system.faction.id,
+			factionName = Game.system.faction.name,
 			org         = ad.org,
 			location    = ad.location,
+			destination = ad.location,
 			rendezvous  = ad.rendezvous,
 			mercenaries = {},
 			introtext   = ad.introtext,
@@ -162,6 +164,7 @@ local onChat = function (form, ref, option)
 		table.insert(missions,Mission.New(mission))
 		form:SetMessage(l["ACCEPTED_" .. Engine.rand:Integer(1, getNumberOfFlavours("ACCEPTED"))])
 		return
+
 	elseif option == 6 then
 		form:SetMessage(l.YOU_NEED_A_RADAR)
 	end
@@ -296,6 +299,19 @@ local onUpdateBB = function (station)
 	end
 end
 
+local setReturnLocation = function (mission)
+		if mission.rendezvous then
+			mission.location = mission.rendezvous
+		else
+			if mission.flavour.is_multi then
+				mission.location = mission.org .. "\n-"
+			else
+				mission.location = mission.org .. "\n" .. mission.factionName
+			end
+		end
+		mission.status = "PENDING_RETURN"
+end
+
 local onShipDestroyed = function (ship, attacker)
 	if ship:IsPlayer() then return end
 
@@ -305,7 +321,7 @@ local onShipDestroyed = function (ship, attacker)
 				table.remove(mission.mercenaries, i)
 				if not mission.complete and (#mission.mercenaries == 0 or mission.dedication <= ARMEDRECON) then
 					mission.complete = true
-					mission.status = "PENDING_RETURN"
+					setReturnLocation(mission)
 					Comms.ImportantMessage(l.MISSION_COMPLETE)
 				end
 				if attacker and attacker:isa("Ship") and attacker:IsPlayer() then
@@ -320,9 +336,9 @@ end
 local missionTimer = function (mission)
 	Timer:CallEvery(mission.duration, function ()
 		if mission.complete or Game.time > mission.due then return true end -- already complete or too late
-		if Game.player.frameBody and Game.player.frameBody.path == mission.location then
+		if Game.player.frameBody and Game.player.frameBody.path == mission.destination then
 			mission.complete = true
-			mission.status = "PENDING_RETURN"
+			setReturnLocation(mission)
 			Comms.ImportantMessage(l.MISSION_COMPLETE)
 			return true
 		else
@@ -335,7 +351,7 @@ local onFrameChanged = function (player)
 	if not player:isa("Ship") or not player:IsPlayer() then return end
 
 	for ref, mission in pairs(missions) do
-		if player.frameBody and player.frameBody.path == mission.location and not mission.in_progress then
+		if player.frameBody and player.frameBody.path == mission.destination and not mission.in_progress then
 			mission.in_progress = true
 
 			local ships
@@ -361,7 +377,7 @@ local onFrameChanged = function (player)
 					}
 
 					local ship
-					if mission.location:GetSystemBody().type == "PLANET_GAS_GIANT" then
+					if mission.destination:GetSystemBody().type == "PLANET_GAS_GIANT" then
 						ship = ShipBuilder.MakeShipOrbit(player.frameBody, template, threat, 1.2 * planet_radius, 3.5 * planet_radius)
 					else
 						ship = ShipBuilder.MakeShipLanded(player.frameBody, template, threat, math.rad(Engine.rand:Number(360)), math.rad(Engine.rand:Number(360)))
@@ -370,7 +386,7 @@ local onFrameChanged = function (player)
 					assert(ship)
 
 					table.insert(mission.mercenaries, ship)
-					ship:AIEnterLowOrbit(Space.GetBody(mission.location.bodyIndex))
+					ship:AIEnterLowOrbit(Space.GetBody(mission.destination.bodyIndex))
 				end
 			end
 
@@ -438,7 +454,7 @@ local onEnterSystem = function (player)
 				local ship = ShipBuilder.MakeShipNear(Game.player, template)
 				assert(ship)
 
-				local path = mission.location:GetStarSystem().path
+				local path = mission.destination:GetStarSystem().path
 				finishMission(ref, mission)
 				ship:HyperjumpTo(path)
 			end
@@ -503,7 +519,7 @@ local buildMissionDescription = function(mission)
 	local ui = require 'pigui'
 
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location)) or "???"
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.destination)) or "???"
 	local subtype = math.ceil(mission.dedication * NUMSUBTYPES)
 	local missiontype = l["MISSION_TYPE_" .. subtype]
 	local missiontypeconvo = l["MISSION_TYPE_CONVO_" .. subtype]
@@ -512,30 +528,27 @@ local buildMissionDescription = function(mission)
 		name    = mission.client.name,
 		org     = mission.org,
 		cash    = Format.Money(mission.reward, false),
-		area    = mission.location:GetSystemBody().name,
-		system  = mission.location:GetStarSystem().name,
-		sectorx = mission.location.sectorX,
-		sectory = mission.location.sectorY,
-		sectorz = mission.location.sectorZ,
+		area    = mission.destination:GetSystemBody().name,
+		system  = mission.destination:GetStarSystem().name,
+		sectorx = mission.destination.sectorX,
+		sectory = mission.destination.sectorY,
+		sectorz = mission.destination.sectorZ,
 		mission = missiontypeconvo,
 		dist    = dist
 	})
 
 	desc.client = mission.client
 
-	if mission.status == "PENDING_RETURN" and mission.rendezvous then
-		desc.location = mission.rendezvous
-	else
-		desc.location = mission.location
-	end
+	desc.location = mission.destination
+	desc.returnLocation = mission.rendezvous or nil
 
 	local paymentLoc = mission.rendezvous and ui.Format.SystemPath(mission.rendezvous)
 		or string.interp(l[mission.flavour.id .. "_LAND_THERE"], { org = mission.org })
 
 	desc.details = {
 		{ l.MISSION, missiontype },
-		{ l.SYSTEM, ui.Format.SystemPath(mission.location) },
-		{ l.AREA, mission.location:GetSystemBody().name },
+		{ l.SYSTEM, ui.Format.SystemPath(mission.destination) },
+		{ l.AREA, mission.destination:GetSystemBody().name },
 		{ l.DISTANCE, dist.." "..lc.UNIT_LY },
 		{ l.TIME_LIMIT, ui.Format.Date(mission.due) },
 		{ l.DANGER, l["RISK_" .. math.ceil(mission.risk * (getNumberOfFlavours("RISK")))] },
