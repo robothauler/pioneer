@@ -307,7 +307,7 @@ local onFrameChanged = function (player)
 				if mission.destination.type == "STARPORT_SURFACE" then
 					ship:AIEnterLowOrbit(Space.GetBody(mission.destination:GetSystemBody().parent.index))
 				end
-				Timer:CallAt(Game.time + 5, function () ship:AIKill(player) end)
+				-- Timer:CallAt(Game.time + 5, function () ship:AIKill(player) end)
 			end
 		end
 
@@ -338,7 +338,7 @@ local onEnterSystem = function (player)
 						Comms.ImportantMessage(pirate_msg, ship.label)
 						mission.surprise = true
 						ship:FireMissileAt("any", player)
-						ship:AIKill(player)
+						-- ship:AIKill(player)
 					else
 						pirate_msg = string.interp(l["PIRATE_ANSWER_" .. Engine.rand:Integer(1, getNumberOfFlavours("PIRATE_ANSWER"))], { client = mission.client.name })
 						Comms.ImportantMessage(pirate_msg, ship.label)
@@ -440,7 +440,7 @@ end
 local onPlayerUndocked = function (player, station)
 	for ref, mission in pairs(missions) do
 		if mission.interceptor then
-			mission.interceptor:AIKill(player)
+			-- mission.interceptor:AIKill(player)
 		end
 	end
 end

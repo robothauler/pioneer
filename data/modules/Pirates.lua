@@ -38,7 +38,7 @@ local onEnterSystem = function (player)
 			local probabilityPirateIsInterested = math.floor(player.usedCargo - discount) / math.max(1,  playerCargoCapacity - discount)
 
 			if Engine.rand:Number(1) <= probabilityPirateIsInterested then
-				ship:AIKill(Game.player)
+				-- ship:AIKill(Game.player)
 			end
 		end
 	end

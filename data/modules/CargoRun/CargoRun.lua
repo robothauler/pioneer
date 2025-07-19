@@ -518,7 +518,7 @@ local onEnterSystem = function (player)
 					pirate = ShipBuilder.MakeShipNear(Game.player, PirateTemplate, threat, 50, 100)
 					assert(pirate)
 
-					pirate:AIKill(Game.player)
+					-- pirate:AIKill(Game.player)
 
 					table.insert(pirate_ships, pirate)
 				end

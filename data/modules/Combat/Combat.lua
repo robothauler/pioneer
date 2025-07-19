@@ -377,7 +377,7 @@ local onFrameChanged = function (player)
 			if #mission.mercenaries ~= 0 then
 				Timer:CallAt(Game.time + 5, function ()
 					for _, s in pairs(mission.mercenaries) do
-						s:AIKill(player)
+						-- s:AIKill(player)
 					end
 				end)
 			end
