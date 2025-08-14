@@ -136,7 +136,7 @@ local onChat = function (form, ref, option)
 			wanted      = ad.wanted,
 			company     = ad.company,
 			location    = ad.location,
-			destination = ad.location:GetStarSystem().path,
+			destination = ad.location:SystemOnly(),
 			visited     = {},
 			shipid      = ad.shipid,
 			ship        = nil,
@@ -487,7 +487,7 @@ end
 local buildMissionDescription = function (mission)
 	local ui = require 'pigui'
 	local desc = {}
-	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location:GetStarSystem().path)) or "???"
+	local dist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.location:SystemOnly())) or "???"
 	local domicileDist = Game.system and string.format("%.2f", Game.system:DistanceTo(mission.domicile)) or "???"
 	local danger = getRiskMsg(mission)
 
@@ -505,7 +505,7 @@ local buildMissionDescription = function (mission)
 		dist = dist
 	})
 
-	desc.location = mission.location:GetStarSystem().path
+	desc.location = mission.location:SystemOnly()
 	desc.client = mission.client
 	desc.returnLocation = mission.domicile
 
