@@ -693,7 +693,7 @@ local onPlayerDocked = function (player, station)
 				scanMgr:CancelScan(mission.scanId)
 			end
 
-			if failed and scan and Game.time < mission.due + (MissionUtils.Days * flavour.days * 0.3) then
+			if failed and scan and Game.time < (mission.due + MissionUtils.Days * flavour.days * 0.3) then
 				-- You get some of the reward if you're back late with the data
 				Comms.ImportantMessage((flavour.failmsg), mission.client.name)
 				Character.persistent.player.reputation = Character.persistent.player.reputation - 1
