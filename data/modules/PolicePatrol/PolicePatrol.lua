@@ -63,9 +63,6 @@ local onShipDestroyed = function (ship, attacker)
 					showMercy = false
 				end
 				break
-			elseif patrol[i] == attacker then
-				Comms.ImportantMessage(l["TARGET_DESTROYED_" .. Engine.rand:Integer(1, MissionUtils.getNumberOfFlavours(l, "TARGET_DESTROYED"))], attacker.label)
-				break
 			end
 		end
 	end
