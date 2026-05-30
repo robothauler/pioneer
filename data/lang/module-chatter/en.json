@@ -1,0 +1,78 @@
+{
+  "ESCAPE_POD": {
+    "description": "",
+    "message": "Escape pod"
+  },
+  "OPPONENT_DESTROYED_1": {
+    "description": "",
+    "message": "Target destroyed!"
+  },
+  "OPPONENT_DESTROYED_2": {
+    "description": "",
+    "message": "Yeah!"
+  },
+  "OPPONENT_DESTROYED_3": {
+    "description": "",
+    "message": "Rest in pieces! Haha."
+  },
+  "OPPONENT_DESTROYED_4": {
+    "description": "",
+    "message": "Another one bites the dust!"
+  },
+  "OPPONENT_GRIPE_1": {
+    "description": "",
+    "message": "Damn! You will pay for this!"
+  },
+  "OPPONENT_GRIPE_2": {
+    "description": "",
+    "message": "Oh no. My poor ship!"
+  },
+  "OPPONENT_GRIPE_3": {
+    "description": "said with vengeance",
+    "message": "Wait, I'll show you."
+  },
+  "OPPONENT_GRIPE_4": {
+    "description": "",
+    "message": "How dare you!"
+  },
+  "OPPONENT_LASTWORDS_1": {
+    "description": "",
+    "message": "Oh no. This is the end."
+  },
+  "OPPONENT_LASTWORDS_2": {
+    "description": "",
+    "message": "Farewell, cruel world."
+  },
+  "OPPONENT_LASTWORDS_3": {
+    "description": "",
+    "message": "The life support system is failing. I need help!"
+  },
+  "OPPONENT_LASTWORDS_4": {
+    "description": "",
+    "message": "The ship is disintegrating. Help!"
+  },
+  "OPPONENT_TAUNT_1": {
+    "description": "",
+    "message": "Take that!"
+  },
+  "OPPONENT_TAUNT_2": {
+    "description": "",
+    "message": "This is the end for you!"
+  },
+  "OPPONENT_TAUNT_3": {
+    "description": "",
+    "message": "You have no chance whatsoever!"
+  },
+  "OPPONENT_WARNING_1": {
+    "description": "",
+    "message": "What's the matter? Have you lost your mind?"
+  },
+  "OPPONENT_WARNING_2": {
+    "description": "",
+    "message": "Are you aiming at me?"
+  },
+  "OPPONENT_WARNING_3": {
+    "description": "",
+    "message": "That's not nice!"
+  }
+}

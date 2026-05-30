@@ -496,7 +496,6 @@ local onUpdateBB = function (station)
 end
 
 local pirate_ships = {}
-local pirate_gripes_time
 local pirate_switch_target
 local escort_ships = {}
 local escort_chatter_time
@@ -540,7 +539,6 @@ local onEnterSystem = function (player)
 				local pirate_greeting = string.interp(l["PIRATE_TAUNTS_" .. Engine.rand:Integer(1, getNumberOfFlavours("PIRATE_TAUNTS"))], {
 					client = mission.client.name, location = mission.location:GetSystemBody().name,})
 				Comms.ImportantMessage(pirate_greeting, pirate.label)
-				pirate_gripes_time = Game.time
 
 				if mission.wholesaler or Engine.rand:Number(0, 1) >= 0.75 then
 					local policeTemplate = EscortTemplate:clone {
@@ -600,7 +598,6 @@ local onShipDestroyed = function (ship, attacker)
 			if pirate_ships[i] == ship then
 				table.remove(pirate_ships, i)
 				if isEscortShip(attacker) then
-					Comms.ImportantMessage(l.TARGET_DESTROYED, attacker.label)
 					if #pirate_ships ~= 0 then
 						attacker:AIKill(pirate_ships[1])
 						escort_switch_target = Game.time + Engine.rand:Integer(90, 120)
@@ -608,15 +605,6 @@ local onShipDestroyed = function (ship, attacker)
 				end
 			end
 		end
-	end
-end
-
-local onShipFiring = function (ship)
-	if ship:IsPlayer() then return end
-
-	if isEscortShip(ship) and Game.time >= escort_chatter_time then -- don't flood the control panel with messages
-		Comms.ImportantMessage(l.GUNS_GUNS_GUNS, ship.label)
-			escort_chatter_time = Game.time + Engine.rand:Integer(15, 45)
 	end
 end
 
@@ -648,12 +636,7 @@ local onShipHit = function (ship, attacker)
 		end
 
 	elseif isPirateShip(ship) then
-		if attacker:IsPlayer() then
-			if Game.time >= pirate_gripes_time then -- don't flood the control panel with messages
-				Comms.ImportantMessage(l["PIRATE_GRIPES_" .. Engine.rand:Integer(1, getNumberOfFlavours("PIRATE_GRIPES"))], ship.label)
-				pirate_gripes_time = Game.time + Engine.rand:Integer(30, 90)
-			end
-		elseif isEscortShip(attacker) then
+		if isEscortShip(attacker) then
 			if Game.time >= pirate_switch_target then
 				ship:AIKill(attacker)
 				pirate_switch_target = Game.time + Engine.rand:Integer(90, 120)
@@ -899,7 +882,6 @@ Event.Register("onUpdateBB", onUpdateBB)
 Event.Register("onEnterSystem", onEnterSystem)
 Event.Register("onLeaveSystem", onLeaveSystem)
 Event.Register("onPlayerDocked", onPlayerDocked)
-Event.Register("onShipFiring", onShipFiring)
 Event.Register("onShipHit", onShipHit)
 Event.Register("onShipDestroyed", onShipDestroyed)
 Event.Register("onGameStart", onGameStart)

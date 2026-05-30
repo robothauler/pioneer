@@ -271,10 +271,6 @@
     "description": "custom cargo",
     "message": "greenhouses"
   },
-  "GUNS_GUNS_GUNS": {
-    "description": "Military radio call to avoid friendly fire. It indicates that the cannon has been activated and should ensure that other friendly pilots do not maneuver into the path of harm.",
-    "message": "Guns, guns, guns."
-  },
   "HAZARDOUS_SUBSTANCES": {
     "description": "custom cargo",
     "message": "hazardous substances"
@@ -451,18 +447,6 @@
     "description": "from a location",
     "message": "Pickup cargo from:"
   },
-  "PIRATE_GRIPES_1": {
-    "description": "",
-    "message": "Damn! You will pay for this!"
-  },
-  "PIRATE_GRIPES_2": {
-    "description": "",
-    "message": "Oh no. My poor ship!"
-  },
-  "PIRATE_GRIPES_3": {
-    "description": "said with vengeance",
-    "message": "Wait, I'll show you."
-  },
   "PIRATE_TAUNTS_1": {
     "description": "",
     "message": "This will be your last run!"
@@ -598,10 +582,6 @@
   "SYSTEM": {
     "description": "",
     "message": "System:"
-  },
-  "TARGET_DESTROYED": {
-    "description": "",
-    "message": "Target destroyed."
   },
   "TITANIUM": {
     "description": "custom cargo",
