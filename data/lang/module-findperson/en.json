@@ -47,8 +47,12 @@
     "description": "",
     "message": "SHIP FOR SEARCH REQUIRED"
   },
-  "ALIVE": {
-    "description": "A person's status",
+  "ALIVE_FEMALE": {
+    "description": "Status of a female person",
+    "message": "Alive"
+  },
+  "ALIVE_MALE": {
+    "description": "Status of a male person",
     "message": "Alive"
   },
   "CLIENT": {
@@ -91,8 +95,12 @@
     "description": "Must be delivered by",
     "message": "Deadline:"
   },
-  "DECEASED": {
-    "description": "A person's status",
+  "DECEASED_FEMALE": {
+    "description": "Status of a female person",
+    "message": "Deceased"
+  },
+  "DECEASED_MALE": {
+    "description": "Status of a male person",
     "message": "Deceased"
   },
   "DENY_1": {

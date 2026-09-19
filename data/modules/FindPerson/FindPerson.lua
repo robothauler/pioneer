@@ -591,7 +591,7 @@ local buildMissionDescription = function (mission)
 		{ l.WANTED, mission.wanted.name },
 		{ l.SYSTEM, ui.Format.SystemPath(mission.location) },
 		{ l.SPACEPORT, mission.tipster and not mission.wanted.dead and mission.location:GetSystemBody().name or l.UNKNOWN },
-		{ l.STATUS, l[status] },
+		{ l.STATUS, l[status .. gender] },
 		{ l.DISTANCE, dist .. " " .. lc.UNIT_LY },
 		mission.flavour.ship and { l.SHIP, mission.shipid },
 		false,
