@@ -613,11 +613,11 @@
   },
   "TIP_DECEASED_DELIVER_MESSAGE_FEMALE_1": {
     "description": "",
-    "message": "You're a few months too late to meet {wanted}. She passed away from a rare disease. It's a very sad story. Buy me a drink and I'll tell you about it."
+    "message": "You're a few months too late to meet {wanted}. She passed away from a rare disease. A very sad story."
   },
   "TIP_DECEASED_DELIVER_MESSAGE_MALE_1": {
     "description": "",
-    "message": "I knew {wanted}. He was a good guy. But he lost his life in the big accident that killed so many people. Maybe you've already read about it in the local media."
+    "message": "I knew {wanted}. He was a good guy. He lost his life in a serious passenger ship crash."
   },
   "TIP_DECEASED_TRAITOR_FEMALE_1": {
     "description": "",
@@ -625,7 +625,7 @@
   },
   "TIP_DECEASED_TRAITOR_MALE_1": {
     "description": "",
-    "message": "I knew {wanted}. He was a fool who thought he could pull the wool over everyone's eyes. I think there was even a report in the local media about his violent death."
+    "message": "I knew {wanted}. He was a fool who thought he could pull the wool over everyone's eyes. He died a violent death."
   },
   "TIP_DECEASED_PRIVATEER_FEMALE_1": {
     "description": "",
@@ -657,7 +657,7 @@
   },
   "TIP_DECEASED_EVACUATION_MALE_1": {
     "description": "",
-    "message": "I met {wanted} a few times on business. He died in a shuttle accident. If you like, I can give you the link to the official police report."
+    "message": "I met {wanted} a few times on business. He died in a shuttle accident. You should always take a closer look at the pilot and his ship before you get on board!"
   },
   "TIP_FEMALE_1": {
     "description": "",
