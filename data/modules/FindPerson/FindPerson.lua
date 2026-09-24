@@ -224,7 +224,7 @@ local makeAdvert = function (station)
 
 	local female = Engine.rand:Integer(1) == 1
 	local gender = female and "_FEMALE" or "_MALE"
-	local dead = Engine.rand:Number(1) < 0.125
+	local dead = Engine.rand:Number(1) < 0.1
 
 	local flavour_number = Engine.rand:Integer(1, #flavours)
 	local flavour = flavours[flavour_number]
